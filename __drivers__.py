@@ -1,4 +1,5 @@
 import pandas as pd
+import sqlalchemy as sa
 import os
 
 class drivers:
@@ -133,8 +134,29 @@ class drivers:
 		return to_parquet, kwargs
 
 
+	def AzureSQL(self,
+	      id : str,
+		  password : str,
+	      dbhost : str,
+		  port : int = 1433,
+		  db : str = 'master'
+		  ):
+
+		cxn_str = ("mssql+pyodbc://{}:{}@{}:{}/{}?" +
+				  "driver=ODBC+Driver+18+for+SQL+Server") \
+					.format(id, password, dbhost, port, db)
+		cxn_args = {"TrustServerCertificate": "yes"}
+		engine = sa.create_engine(cxn_str, connect_args=cxn_args)
+
+		pd.read_sql("select * from sys.databases", engine)
+
+		# with engine.connect() as con:
+		#  	ret = con.execute("select * from sys.databases")
+
 ################################################################################
 
+
+AzureSQL(id='santy',password='Password1', dbhost='172.17.0.3', db='dwh')
 
 
 
